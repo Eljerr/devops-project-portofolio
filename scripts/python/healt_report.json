@@ -1,0 +1,17 @@
+[
+    {
+        "name": "Nginx Web",
+        "status": "ERROR",
+        "detail": "('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))"
+    },
+    {
+        "name": "NodeJS API",
+        "status": "ERROR",
+        "detail": "('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))"
+    },
+    {
+        "name": "Payment Gateway",
+        "status": "ERROR",
+        "detail": "HTTPSConnectionPool(host='domain-ini-pasti-error-123.com', port=443): Max retries exceeded with url: / (Caused by NameResolutionError(\"HTTPSConnection(host='domain-ini-pasti-error-123.com', port=443): Failed to resolve 'domain-ini-pasti-error-123.com' ([Errno -2] Name or service not known)\"))"
+    }
+]
