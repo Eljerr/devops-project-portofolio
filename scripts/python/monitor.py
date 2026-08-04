@@ -1,6 +1,12 @@
 import requests
 import json
 import logging
+import argparse
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--output", required=True)
+args = parser.parse_args()
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
@@ -32,7 +38,7 @@ def check_services(service):
 
         result.append(write)
 
-    with open("healt_report.json", "w") as file:
+    with open(args.output, "w") as file:
         json.dump(result, file, indent=4)
 
 
