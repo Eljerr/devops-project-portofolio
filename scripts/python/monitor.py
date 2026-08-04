@@ -1,7 +1,8 @@
-import requests
 import json
 import logging
 import argparse
+import asyncio
+import aiohttp
 
 
 parser = argparse.ArgumentParser()
@@ -19,27 +20,31 @@ target_service = [
 ]
 
 
-def check_services(service):
-    result = []
-    logging.info("Memulai pengecekan kesehatan server...")
-    for target in service:
-        try:
-            response = requests.get(target["url"])
-            if response.status_code == 200:
-                write = {"name": target["name"], "status": "UP"}
+async def fetch_status(session, target):
+    try:
+        async with session.get(target["url"]) as response:
+            if response.status == 200:
+                return {"name": target["name"], "status": "UP"}
             else:
-                write = {"name": target["name"], "status": "DOWN"}
                 logging.warning(
                     f"Perlu tindak lebih lanjut pada server {target['name']}"
                 )
-        except requests.exceptions.RequestException as e:
-            write = {"name": target["name"], "status": "ERROR", "detail": str(e)}
-            logging.error(f"Server {target['name']} tidak merespon")
-
-        result.append(write)
-
-    with open(args.output, "w") as file:
-        json.dump(result, file, indent=4)
+                return {"name": target["name"], "status": "DOWN"}
+    except aiohttp.ClientError as e:
+        logging.error(f"Server {target['name']} tidak merespon")
+        return {"name": target["name"], "status": "ERROR", "detail": str(e)}
 
 
-check_services(target_service)
+async def check_services(service, output_file):
+    logging.info("Memulai pengecekan kesehatan server secara asinkron...")
+
+    async with aiohttp.ClientSession() as session:
+        tasks = [fetch_status(session, target) for target in service]
+
+        result = await asyncio.gather(*tasks)
+
+        with open(output_file, "w") as file:
+            json.dump(result, file, indent=4)
+
+
+asyncio.run(check_services(target_service, args.output))

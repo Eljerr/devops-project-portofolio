@@ -1,0 +1,17 @@
+[
+    {
+        "name": "Nginx Web",
+        "status": "ERROR",
+        "detail": "Server disconnected"
+    },
+    {
+        "name": "NodeJS API",
+        "status": "ERROR",
+        "detail": "Server disconnected"
+    },
+    {
+        "name": "Payment Gateway",
+        "status": "ERROR",
+        "detail": "Cannot connect to host domain-ini-pasti-error-123.com:443 ssl:default [Name or service not known]"
+    }
+]
