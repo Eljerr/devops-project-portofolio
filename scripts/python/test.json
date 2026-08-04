@@ -2,12 +2,12 @@
     {
         "name": "Nginx Web",
         "status": "ERROR",
-        "detail": "Server disconnected"
+        "detail": "Cannot connect to host httpstat.us:443 ssl:default [Connection reset by peer]"
     },
     {
         "name": "NodeJS API",
         "status": "ERROR",
-        "detail": "Server disconnected"
+        "detail": "Connection timeout to host https://httpstat.us/502"
     },
     {
         "name": "Payment Gateway",

@@ -20,31 +20,36 @@ target_service = [
 ]
 
 
-async def fetch_status(session, target):
-    try:
-        async with session.get(target["url"]) as response:
-            if response.status == 200:
-                return {"name": target["name"], "status": "UP"}
-            else:
-                logging.warning(
-                    f"Perlu tindak lebih lanjut pada server {target['name']}"
-                )
-                return {"name": target["name"], "status": "DOWN"}
-    except aiohttp.ClientError as e:
-        logging.error(f"Server {target['name']} tidak merespon")
-        return {"name": target["name"], "status": "ERROR", "detail": str(e)}
+class ServiceMonitor:
+    def __init__(self, services, output_file):
+        self.services = services
+        self.output_file = output_file
+
+    async def fetch_status(self, session, target):
+        try:
+            async with session.get(target["url"]) as response:
+                if response.status == 200:
+                    return {"name": target["name"], "status": "UP"}
+                else:
+                    logging.warning(
+                        f"Perlu tindak lebih lanjut pada server {target['name']}"
+                    )
+                    return {"name": target["name"], "status": "DOWN"}
+        except aiohttp.ClientError as e:
+            logging.error(f"Server {target['name']} tidak merespon")
+            return {"name": target["name"], "status": "ERROR", "detail": str(e)}
+
+    async def run(self):
+        logging.info("Memulai pengecekan kesehatan server secara asinkron...")
+
+        async with aiohttp.ClientSession() as session:
+            tasks = [self.fetch_status(session, target) for target in self.services]
+
+            result = await asyncio.gather(*tasks)
+
+            with open(self.output_file, "w") as file:
+                json.dump(result, file, indent=4)
 
 
-async def check_services(service, output_file):
-    logging.info("Memulai pengecekan kesehatan server secara asinkron...")
-
-    async with aiohttp.ClientSession() as session:
-        tasks = [fetch_status(session, target) for target in service]
-
-        result = await asyncio.gather(*tasks)
-
-        with open(output_file, "w") as file:
-            json.dump(result, file, indent=4)
-
-
-asyncio.run(check_services(target_service, args.output))
+monitor = ServiceMonitor(target_service, args.output)
+asyncio.run(monitor.run())
